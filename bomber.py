@@ -1,5 +1,5 @@
 from asyncio import get_event_loop, AbstractEventLoop
-from app.aio_bomber import configuration_logger, AioBomber
+from aio_bomber import configuration_logger, AioBomber
 from loguru import logger
 from argparse import ArgumentParser
 
