@@ -4,10 +4,14 @@ from loguru import logger
 import sys
 
 
-def configuration_logger(error_handler: bool = False) -> None:
+def configuration_logger(error_handler: bool = False, is_debug: bool = False) -> None:
     logger.remove()
+    if is_debug:
+        level = 'DEBUG'
+    else:
+        level = 'INFO'
     logger.add(sys.stdout, colorize=True, format="<green>{time:YYYY-MM-DD at HH:mm:ss}</green> | <level>{level}</level> | {message}",
-               level="INFO")
+               level=level)
     if error_handler:
         logger.add('error.log', format="{time:YYYY-MM-DD at HH:mm:ss} | {level} | {message}",
                    level="ERROR")

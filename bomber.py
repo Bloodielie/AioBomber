@@ -16,4 +16,7 @@ async def main() -> None:
     await bomber.close_session()
     logger.info('Exit!')
 
-run(main())
+if __name__ == "__main__":
+    run(main())
+else:
+    raise Exception()
