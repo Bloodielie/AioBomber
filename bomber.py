@@ -1,22 +1,28 @@
-from asyncio import run
+from asyncio import get_event_loop, AbstractEventLoop
 from app.aio_bomber import configuration_logger, AioBomber
 from loguru import logger
 from argparse import ArgumentParser
 
 
-async def main() -> None:
+async def main(loop: AbstractEventLoop) -> None:
     parser = ArgumentParser()
     parser.add_argument('--phone', action="store", required=True, type=str, help="Phone for SMS Bomber")
     parser.add_argument('--cycles', action="store", default=1, type=int, help="Number of cycles")
     args = parser.parse_args()
     configuration_logger()
-    logger.info('Start AioBomber!')
-    bomber = AioBomber()
+
+    logger.info('Start AioBomber')
+    bomber = AioBomber(loop=loop)
     await bomber.attack(args.cycles, args.phone)
+
+    logger.info('Exit')
     await bomber.close_session()
-    logger.info('Exit!')
+    loop.stop()
+
 
 if __name__ == "__main__":
-    run(main())
+    loop = get_event_loop()
+    loop.run_until_complete(main(loop))
+    loop.run_forever()
 else:
     raise Exception()

@@ -9,35 +9,27 @@ except ImportError:
 
 
 class AioBomber:
-    def __init__(self, session: aiohttp.ClientSession = None) -> None:
+    def __init__(self, session: aiohttp.ClientSession = None, loop: asyncio.AbstractEventLoop = None) -> None:
         self._session = session or aiohttp.ClientSession(json_serialize=json.dumps)
         self._sender = sender.Sender(self._session)
         self._utils = utils.BomberUtils()
-        try:
-            loop = asyncio.get_running_loop()
-        except RuntimeError:
-            loop = asyncio.get_event_loop()
+        if loop is None:
+            try:
+                loop = asyncio.get_running_loop()
+            except RuntimeError:
+                loop = asyncio.get_event_loop()
         self._loop = loop
 
-    async def attack(self, number_of_cycles: int, phone: str, have_ui: bool = False):
+    async def attack(self, number_of_cycles: int, phone: str, sleep_time: int = 2, path_to_service: str = None) -> None:
         logger.info('Start attack')
-        if not have_ui:
-            path_to_service = 'app/aio_bomber/services.json'
-        else:
-            path_to_service = 'aio_bomber/services.json'
+        path_to_service = path_to_service or 'app/aio_bomber/services.json'
         services = await self._sender.get_services(path_to_service)
         for _ in range(number_of_cycles):
-            tasks = []
             for value in services.values():
                 args = self._utils.generate_args(value, phone)
                 header = value.get('header')
-                if not have_ui:
-                    tasks.append(self._sender.post(header=header, **args))
-                else:
-                    self._loop.create_task(self._sender.post(header=header, **args))
-            if not have_ui:
-                await asyncio.gather(*tasks)
-            await asyncio.sleep(2)
+                self._loop.create_task(self._sender.post(header=header, **args))
+            await asyncio.sleep(sleep_time)
 
     @property
     def loop(self) -> asyncio.AbstractEventLoop:
@@ -48,10 +40,10 @@ class AioBomber:
         if isinstance(event_loop, asyncio.AbstractEventLoop):
             self._loop = event_loop
         else:
-            raise TypeError("You must pass eventloop")
+            raise TypeError("You must pass event loop")
 
     @property
-    def get_session(self):
+    def get_session(self) -> aiohttp.ClientSession:
         return self._session
 
     async def close_session(self) -> None:
