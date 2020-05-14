@@ -1,7 +1,10 @@
-import ujson as json
 from typing import Dict, Any
 from loguru import logger
-from aiohttp import ClientSession
+from aiohttp import ClientSession, client_exceptions
+try:
+    import ujson as json
+except ImportError:
+    import json
 
 
 class Sender:
@@ -24,7 +27,10 @@ class Sender:
             header.update(self._headers)
         try:
             async with self.session.post(url=url, data=data, headers=header) as response:
-                json_ = await response.json()
+                try:
+                    json_ = await response.json()
+                except client_exceptions.ContentTypeError:
+                    json_ = await response.text()
                 logger.debug(f'{url}\n{json_}\n')
                 return json_
         except Exception as e:

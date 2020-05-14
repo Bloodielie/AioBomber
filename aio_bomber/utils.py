@@ -1,7 +1,7 @@
-from typing import Dict, Optional
-from random import choice
 from loguru import logger
 import sys
+from random import choice
+from .constants import LATIN_ALPHABET, LIST_OF_FIRSTNAME, LIST_OF_LASTTNAME
 
 
 def configuration_logger(error_handler: bool = False, is_debug: bool = False) -> None:
@@ -17,37 +17,17 @@ def configuration_logger(error_handler: bool = False, is_debug: bool = False) ->
                    level="ERROR")
 
 
-class BomberUtils:
+class LineGenerator:
     @staticmethod
     def generate_email(mail_url: str = None, len_email: int = 10) -> str:
         mail_url = mail_url or 'gmail.com'
-        lat_alf = 'abcdefghijklmnopqrstuvwxyz'
-        mail = ''.join([choice(lat_alf) for _ in range(len_email)])
+        mail = ''.join([choice(LATIN_ALPHABET) for _ in range(len_email)])
         return f'{mail}@{mail_url}'
 
-    def generate_args(self, service: dict, phone: str) -> Dict[str, Optional[str]]:
-        args = {}
-        url = service.get('url')
-        if not url:
-            raise Exception('Not url in json')
-        args['url'] = url
-        static_data = service.get('static_data')
-        if static_data:
-            args['data'] = static_data
-        else:
-            args['data'] = {}
+    @staticmethod
+    def generate_firstname():
+        return choice(LIST_OF_FIRSTNAME)
 
-        data_args = args.copy()['data']
-        dynamic_data = service.get('dynamic_data')
-        if not dynamic_data:
-            raise Exception('Not dynamic_data in json')
-        if dynamic_data.get('email'):
-            data_args['email'] = self.generate_email()
-        formatted_phone = dynamic_data.get('formatted_phone')
-        if formatted_phone:
-            data_args[formatted_phone] = phone
-        else:
-            raise Exception('Not phone in json')
-        args.update({'data': data_args})
-
-        return args
+    @staticmethod
+    def generate_lastname():
+        return choice(LIST_OF_LASTTNAME)

@@ -1,5 +1,5 @@
 import asyncio
-from . import sender, utils
+from . import sender, preparer
 from loguru import logger
 import aiohttp
 try:
@@ -12,7 +12,7 @@ class AioBomber:
     def __init__(self, session: aiohttp.ClientSession = None, loop: asyncio.AbstractEventLoop = None) -> None:
         self._session = session or aiohttp.ClientSession(json_serialize=json.dumps)
         self._sender = sender.Sender(self._session)
-        self._utils = utils.BomberUtils()
+        self._preparer = preparer.Preparer()
         if loop is None:
             try:
                 loop = asyncio.get_running_loop()
@@ -26,7 +26,7 @@ class AioBomber:
         services = await self._sender.get_services(path_to_service)
         for _ in range(number_of_cycles):
             for value in services.values():
-                args = self._utils.generate_args(value, phone)
+                args = self._preparer.generate_args(value, phone)
                 header = value.get('header')
                 self._loop.create_task(self._sender.post(header=header, **args))
             await asyncio.sleep(sleep_time)
