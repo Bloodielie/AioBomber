@@ -1,4 +1,4 @@
-aiohttp==3.6.2
 loguru==0.4.1
-ujson==2.0.3
 fastapi==0.54.1
+aiohttp==3.6.2
+ujson==2.0.3
