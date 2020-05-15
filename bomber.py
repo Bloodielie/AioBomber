@@ -1,7 +1,8 @@
-from asyncio import get_event_loop, AbstractEventLoop
+from asyncio import get_event_loop, AbstractEventLoop, Task, sleep
 from aio_bomber import configuration_logger, AioBomber
 from loguru import logger
 from argparse import ArgumentParser
+from aio_bomber.utils import pending_tasks
 
 
 async def main(loop: AbstractEventLoop) -> None:
@@ -14,6 +15,7 @@ async def main(loop: AbstractEventLoop) -> None:
     logger.info('Start AioBomber')
     bomber = AioBomber(loop=loop)
     await bomber.attack(args.cycles, args.phone)
+    await pending_tasks()
 
     logger.info('Exit')
     await bomber.close_session()
