@@ -1,4 +1,4 @@
-from asyncio import get_event_loop, AbstractEventLoop, Task, sleep
+from asyncio import get_event_loop, AbstractEventLoop
 from aio_bomber import configuration_logger, AioBomber
 from loguru import logger
 from argparse import ArgumentParser

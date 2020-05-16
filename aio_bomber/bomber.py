@@ -1,7 +1,6 @@
 import asyncio
 from . import sender, preparer
 from loguru import logger
-import aiohttp
 from typing import Union
 try:
     import ujson as json
@@ -10,17 +9,19 @@ except ImportError:
 
 
 class AioBomber:
-    def __init__(self, session: aiohttp.ClientSession = None, loop: asyncio.AbstractEventLoop = None) -> None:
-        self._session = session or aiohttp.ClientSession(json_serialize=json.dumps)
-        self._sender = sender.Sender(self._session)
+    def __init__(self, loop: asyncio.AbstractEventLoop = None) -> None:
+        self._sender = sender.Sender()
         self._preparer = preparer.Preparer()
-        if loop is None:
-            try:
-                loop = asyncio.get_running_loop()
-            except RuntimeError:
-                loop = asyncio.get_event_loop()
-        self._loop = loop
+        self._loop = loop or self._get_loop()
         self._cache = {}
+
+    @staticmethod
+    def _get_loop() -> asyncio.AbstractEventLoop:
+        try:
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            loop = asyncio.get_event_loop()
+        return loop
 
     async def attack(self,
                      number_of_cycles: int,
@@ -49,4 +50,4 @@ class AioBomber:
                 self._loop.create_task(self._sender.post(**value))
 
     async def close_session(self) -> None:
-        await self._session.close()
+        await self._sender.close_session()

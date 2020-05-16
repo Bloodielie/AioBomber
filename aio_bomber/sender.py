@@ -13,8 +13,8 @@ class Sender:
         "X-Requested-With": "XMLHttpRequest",
     }
 
-    def __init__(self, session: ClientSession):
-        self.session = session
+    def __init__(self, session: ClientSession = None):
+        self._session = session or ClientSession(json_serialize=json.dumps)
 
     async def get_services(self, path: str, encoding: str = 'utf-8') -> Dict[str, Any]:
         with open(path, 'r', encoding=encoding) as file:
@@ -26,7 +26,7 @@ class Sender:
         else:
             header.update(self._headers)
         try:
-            async with self.session.post(url=url, data=data, headers=header) as response:
+            async with self._session.post(url=url, data=data, headers=header) as response:
                 try:
                     json_ = await response.json()
                 except client_exceptions.ContentTypeError:
@@ -35,3 +35,6 @@ class Sender:
                 return json_
         except Exception as e:
             logger.error(e)
+
+    async def close_session(self) -> None:
+        await self._session.close()
