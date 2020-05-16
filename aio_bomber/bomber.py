@@ -2,10 +2,6 @@ import asyncio
 from . import sender, preparer
 from loguru import logger
 from typing import Union
-try:
-    import ujson as json
-except ImportError:
-    import json
 
 
 class AioBomber:

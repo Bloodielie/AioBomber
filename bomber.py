@@ -10,7 +10,7 @@ async def main(loop: AbstractEventLoop) -> None:
     parser.add_argument('--phone', action="store", required=True, type=str, help="Phone for SMS Bomber")
     parser.add_argument('--cycles', action="store", default=1, type=int, help="Number of cycles")
     args = parser.parse_args()
-    configuration_logger()
+    configuration_logger(is_debug=True)
 
     logger.info('Start AioBomber')
     bomber = AioBomber(loop=loop)

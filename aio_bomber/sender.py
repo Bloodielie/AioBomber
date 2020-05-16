@@ -1,10 +1,8 @@
+from json import JSONDecodeError
 from typing import Dict, Any
 from loguru import logger
-from aiohttp import ClientSession, client_exceptions
-try:
-    import ujson as json
-except ImportError:
-    import json
+import json
+from httpx import AsyncClient
 
 
 class Sender:
@@ -13,8 +11,8 @@ class Sender:
         "X-Requested-With": "XMLHttpRequest",
     }
 
-    def __init__(self, session: ClientSession = None):
-        self._session = session or ClientSession(json_serialize=json.dumps)
+    def __init__(self, session: AsyncClient = None):
+        self._client = session or AsyncClient()
 
     async def get_services(self, path: str, encoding: str = 'utf-8') -> Dict[str, Any]:
         with open(path, 'r', encoding=encoding) as file:
@@ -26,15 +24,15 @@ class Sender:
         else:
             header.update(self._headers)
         try:
-            async with self._session.post(url=url, data=data, headers=header) as response:
-                try:
-                    json_ = await response.json()
-                except client_exceptions.ContentTypeError:
-                    json_ = await response.text()
-                logger.debug(f'{url}\n{json_}\n')
-                return json_
+            response = await self._client.post(url=url, data=data, headers=header)
+            try:
+                json_ = response.json()
+            except (UnicodeDecodeError, JSONDecodeError):
+                json_ = response.text
+            logger.debug(f'{url}\n{json_}\n')
+            return json_
         except Exception as e:
             logger.error(e)
 
     async def close_session(self) -> None:
-        await self._session.close()
+        await self._client.aclose()
