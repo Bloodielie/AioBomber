@@ -1,8 +1,7 @@
-from json import JSONDecodeError
 from typing import Dict, Any
 from loguru import logger
+from aiohttp import ClientSession, client_exceptions
 import json
-from httpx import AsyncClient
 
 
 class Sender:
@@ -11,8 +10,8 @@ class Sender:
         "X-Requested-With": "XMLHttpRequest",
     }
 
-    def __init__(self, session: AsyncClient = None):
-        self._client = session or AsyncClient()
+    def __init__(self, session: ClientSession = None):
+        self._session = session or ClientSession()
 
     async def get_services(self, path: str, encoding: str = 'utf-8') -> Dict[str, Any]:
         with open(path, 'r', encoding=encoding) as file:
@@ -24,15 +23,17 @@ class Sender:
         else:
             header.update(self._headers)
         try:
-            response = await self._client.post(url=url, data=data, headers=header)
-            try:
-                json_ = response.json()
-            except (UnicodeDecodeError, JSONDecodeError):
-                json_ = response.text
-            logger.debug(f'{url}\n{json_}\n')
-            return json_
+            async with self._session.post(url=url, data=data, headers=header) as response:
+                try:
+                    json_ = await response.json()
+                except client_exceptions.ContentTypeError:
+                    json_ = await response.text()
+                logger.debug(f'{url}\n{json_}\n')
+                return json_
+        except client_exceptions.TooManyRedirects:
+            pass
         except Exception as e:
-            logger.error(e)
+            logger.exception(e)
 
     async def close_session(self) -> None:
-        await self._client.aclose()
+        await self._session.close()
