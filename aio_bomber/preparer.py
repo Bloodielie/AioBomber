@@ -1,40 +1,20 @@
-from typing import Dict, Optional
-from .utils import LineGenerator
+from typing import Dict, Union
+
+from .generators import DynamicDataGenerator
+from .models import ServiceModel
 
 
-class Preparer:
+class InformationPreparer:
     def __init__(self):
-        self._line_generator = LineGenerator()
+        self.cache = []
+        self.dynamic_data_generator = DynamicDataGenerator()
 
-    def generate_args(self, service: dict, phone: str) -> Dict[str, Optional[str]]:
-        args = {}
-        url = service.get('url')
-        if not url:
-            raise Exception('Not url in json')
-        args['url'] = url
-        static_data = service.get('static_data')
-        if static_data:
-            args['data'] = static_data
-        else:
-            args['data'] = {}
-
-        data_args = args.copy()['data']
+    def get_json_model(self, service: Dict[str, Union[str, dict]], phone: str) -> ServiceModel:
         dynamic_data = service.get('dynamic_data')
-        if not dynamic_data:
-            raise Exception('Not dynamic_data in json')
-        if dynamic_data.get('email'):
-            data_args['email'] = self._line_generator.generate_email()
-        lastname = dynamic_data.get('lastname')
-        if lastname:
-            data_args[lastname] = self._line_generator.generate_lastname()
-        firstname = dynamic_data.get('firstname')
-        if firstname:
-            data_args[firstname] = self._line_generator.generate_firstname()
+        service.update({'dynamic_data': self.dynamic_data_generator.generation(dynamic_data, phone)})
+        json_data = ServiceModel(**service)
+        self.cache.append(json_data)
+        return json_data
 
-        formatted_phone = dynamic_data.get('formatted_phone')
-        if formatted_phone:
-            data_args[formatted_phone] = phone
-        else:
-            raise Exception('Not phone in json')
-        args.update({'data': data_args})
-        return args
+    def __len__(self) -> int:
+        return len(self.cache)

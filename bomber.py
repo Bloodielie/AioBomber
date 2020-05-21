@@ -1,7 +1,9 @@
-from asyncio import get_event_loop, AbstractEventLoop
-from aio_bomber import configuration_logger, AioBomber
-from loguru import logger
 from argparse import ArgumentParser
+from asyncio import get_event_loop, AbstractEventLoop
+
+from loguru import logger
+
+from aio_bomber import configuration_logger, AioBomber
 from aio_bomber.utils import pending_tasks
 
 
@@ -10,7 +12,7 @@ async def main(loop: AbstractEventLoop) -> None:
     parser.add_argument('--phone', action="store", required=True, type=str, help="Phone for SMS Bomber")
     parser.add_argument('--cycles', action="store", default=1, type=int, help="Number of cycles")
     args = parser.parse_args()
-    configuration_logger(is_debug=True)
+    configuration_logger()
 
     logger.info('Start AioBomber')
     bomber = AioBomber(loop=loop)

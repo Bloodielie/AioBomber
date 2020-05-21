@@ -1,7 +1,8 @@
-from typing import Dict, Any
-from loguru import logger
-from aiohttp import ClientSession, client_exceptions
 import json
+from typing import Dict, Any
+
+from aiohttp import ClientSession, client_exceptions
+from loguru import logger
 
 
 class Sender:
