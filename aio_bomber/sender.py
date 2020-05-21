@@ -12,17 +12,13 @@ class Sender:
     }
 
     def __init__(self, session: ClientSession = None):
-        self._session = session or ClientSession()
+        self._session = session or ClientSession(headers=self._headers)
 
     async def get_services(self, path: str, encoding: str = 'utf-8') -> Dict[str, Any]:
         with open(path, 'r', encoding=encoding) as file:
             return json.load(file)
 
     async def post(self, url: str, data: dict, header: dict = None) -> Dict[str, Any]:
-        if not header:
-            header = self._headers
-        else:
-            header.update(self._headers)
         try:
             async with self._session.post(url=url, data=data, headers=header) as response:
                 try:
