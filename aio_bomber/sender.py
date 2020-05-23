@@ -1,5 +1,5 @@
 import json
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Union, Optional
 
 from aiohttp import ClientSession, client_exceptions
 from loguru import logger
@@ -19,21 +19,30 @@ class Sender:
         url = url if url is not None else API_LINK
         services = []
         if path is not None:
-            with open(path, 'r', encoding=encoding) as file:
-                services = json.load(file)
-        async with self._session.get(url=url) as response:
-            json_ = await response.json()
-            services.extend(json_)
+            try:
+                with open(path, 'r', encoding=encoding) as file:
+                    services = json.load(file)
+            except FileNotFoundError:
+                logger.error(f'File not found, path:{path}')
+        json_ = await self.get(url=url)
+        services.extend(json_)
         return services
 
-    async def post(self, url: str, data: dict, header: dict = None) -> Dict[str, Any]:
+    async def get(self, url: str, **kwargs: Union[dict, str]) -> Optional[Dict[str, Any]]:
+        return await self.request('get', url=url, **kwargs)
+
+    async def post(self, url: str, data: dict, header: dict = None, **kwargs: Union[dict, str]) -> Optional[Dict[str, Any]]:
+        return await self.request('post', url=url, data=data, headers=header, **kwargs)
+
+    async def request(self, method_in_session: str, **kwargs: Union[dict, str]) -> Any:
         try:
-            async with self._session.post(url=url, data=data, headers=header) as response:
+            method = getattr(self._session, method_in_session)
+            async with method(**kwargs) as response:
                 try:
                     json_ = await response.json()
                 except client_exceptions.ContentTypeError:
                     json_ = await response.text()
-                logger.debug(f'{url}\n{json_}\n')
+                logger.debug(f'\nFunc args: {kwargs}\nMethod: {method_in_session.upper()}\nResponse: {json_}')
                 return json_
         except client_exceptions.TooManyRedirects:
             pass
