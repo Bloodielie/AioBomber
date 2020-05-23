@@ -4,23 +4,21 @@ from asyncio import get_event_loop, AbstractEventLoop
 from loguru import logger
 
 from aio_bomber import configuration_logger, AioBomber
-from aio_bomber.utils import pending_tasks
 
 
 async def main(loop: AbstractEventLoop) -> None:
     parser = ArgumentParser()
     parser.add_argument('--phone', action="store", required=True, type=str, help="Phone for SMS Bomber")
     parser.add_argument('--cycles', action="store", default=1, type=int, help="Number of cycles")
+    parser.add_argument('--debug', action="store", default=False, type=bool, help="Debug mode")
     args = parser.parse_args()
-    configuration_logger()
+    configuration_logger(is_debug=args.debug)
 
     logger.info('Start AioBomber')
     bomber = AioBomber(loop=loop)
     await bomber.attack(args.cycles, args.phone)
-    await pending_tasks()
 
     logger.info('Exit')
-    await bomber.close_session()
     loop.stop()
 
 
