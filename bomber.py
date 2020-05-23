@@ -17,7 +17,6 @@ async def main(loop: AbstractEventLoop) -> None:
     logger.info('Start AioBomber')
     bomber = AioBomber(loop=loop)
     await bomber.attack(args.cycles, args.phone)
-
     logger.info('Exit')
     loop.stop()
 

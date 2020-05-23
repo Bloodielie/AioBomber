@@ -1,5 +1,6 @@
-{
-  "alpari": {
+[
+  {
+    "name": "alpari",
     "url": "https://alpari.com/api/en/protection/deliver/2f178b17990ca4b7903aa834b9f54c2c0bcb01a2/",
     "header": {
       "Referer": "https://alpari.com/en/registration/"
@@ -13,13 +14,15 @@
       "email": "email"
     }
   },
-  "ivi": {
+  {
+    "name": "ivi",
     "url": "https://api.ivi.ru/mobileapi/user/register/phone/v6",
     "dynamic_data": {
       "formatted_phone": "phone"
     }
   },
-  "icq": {
+  {
+    "name": "icq",
     "url": "https://www.icq.com/smsreg/requestPhoneValidation.php",
     "static_data": {
       "locale": "en",
@@ -32,13 +35,15 @@
       "formatted_phone": "msisdn"
     }
   },
-  "koronopay": {
+  {
+    "name": "koronopay",
     "url": "https://koronapay.com/transfers/online/api/users/otps",
     "dynamic_data": {
       "formatted_phone": "phone"
     }
   },
-  "delimobil": {
+  {
+    "name": "delimobil",
     "url": "https://api.delitime.ru/api/v2/signup",
     "dynamic_data": {
       "formatted_phone": "SignupForm[username]"
@@ -47,25 +52,29 @@
       "SignupForm[device_type]": 3
     }
   },
-  "worki": {
+  {
+    "name": "worki",
     "url": "https://api.iconjob.co/api/auth/verification_code",
     "dynamic_data": {
       "formatted_phone": "phone"
     }
   },
-  "youla": {
+  {
+    "name": "youla",
     "url": "https://youla.ru/web-api/auth/request_code",
     "dynamic_data": {
       "formatted_phone": "phone"
     }
   },
-  "tinder": {
+  {
+    "name": "tinder",
     "url": "https://api.gotinder.com/v2/auth/sms/send?auth_type=sms&locale=ru",
     "dynamic_data": {
       "formatted_phone": "phone_number"
     }
   },
-  "conteshop": {
+  {
+    "name": "conteshop",
     "url": "https://conteshop.by/ru/ajaxlogin/ajax/index/",
     "header": {
       "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
@@ -83,4 +92,4 @@
       "lastname": "lastname"
     }
   }
-}
+]

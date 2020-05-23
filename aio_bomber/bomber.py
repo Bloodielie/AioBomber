@@ -19,6 +19,7 @@ class AioBomber:
             loop = asyncio.get_running_loop()
         except RuntimeError:
             loop = asyncio.get_event_loop()
+        logger.debug(f'Event loop received: {loop}')
         return loop
 
     async def attack(self,
@@ -40,9 +41,9 @@ class AioBomber:
         if is_auto_close_session:
             await self.sender.close_session()
 
-    def _attacker(self, services: Union[None, dict], phone: str) -> None:
+    def _attacker(self, services: Union[None, dict, list], phone: str) -> None:
         if not len(self._preparer):
-            for value in services.values():
+            for value in services:
                 args = self._preparer.get_json_model(value, phone)
                 self._loop.create_task(self.sender.post(**args.generator_args()))
         else:

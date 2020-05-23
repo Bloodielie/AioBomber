@@ -1,8 +1,9 @@
 import json
-from typing import Dict, Any
+from typing import List, Dict, Any
 
 from aiohttp import ClientSession, client_exceptions
 from loguru import logger
+from .constants import API_LINK
 
 
 class Sender:
@@ -14,9 +15,16 @@ class Sender:
     def __init__(self, session: ClientSession = None):
         self._session = session or ClientSession(headers=self._headers)
 
-    async def get_services(self, path: str, encoding: str = 'utf-8') -> Dict[str, Any]:
-        with open(path, 'r', encoding=encoding) as file:
-            return json.load(file)
+    async def get_services(self, path: str = None, url: str = None, encoding: str = 'utf-8') -> List[Dict[str, Any]]:
+        url = url if url is not None else API_LINK
+        services = []
+        if path is not None:
+            with open(path, 'r', encoding=encoding) as file:
+                services = json.load(file)
+        async with self._session.get(url=url) as response:
+            json_ = await response.json()
+            services.extend(json_)
+        return services
 
     async def post(self, url: str, data: dict, header: dict = None) -> Dict[str, Any]:
         try:
