@@ -47,5 +47,5 @@ class AioBomber:
                 args = self._preparer.get_json_model(value, phone)
                 self._loop.create_task(self.sender.post(**args.generator_args()))
         else:
-            for args in self._preparer.cache:
-                self._loop.create_task(self.sender.post(**args.generator_args()))
+            for values in self._preparer.cache.values():
+                self._loop.create_task(self.sender.post(**values[1]))
