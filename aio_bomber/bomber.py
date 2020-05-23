@@ -44,7 +44,7 @@ class AioBomber:
     def _attacker(self, services: Union[None, dict, list], phone: str) -> None:
         if not len(self._preparer):
             for value in services:
-                args = self._preparer.get_json_model(value, phone)
+                args = self._preparer.get_service_model(value, phone)
                 self._loop.create_task(self.sender.post(**args.generator_args()))
         else:
             for values in self._preparer.cache.values():

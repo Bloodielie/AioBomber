@@ -21,9 +21,9 @@ class DynamicDataGenerator:
         return phone
 
     @staticmethod
-    def _email(mail_url: str = None, len_email: int = 10) -> str:
+    def _email(mail_url: str = None, len_email: int = 20) -> str:
         mail_url = mail_url or 'gmail.com'
-        mail = ''.join([choice(LATIN_ALPHABET) for _ in range(len_email)])
+        mail = ''.join([choice(LATIN_ALPHABET) for _ in range(len_email-(len(mail_url) + 1))])
         return f'{mail}@{mail_url}'
 
     @staticmethod
