@@ -3,6 +3,7 @@ from typing import List, Dict, Any, Union, Optional
 
 from aiohttp import ClientSession, client_exceptions
 from loguru import logger
+
 from .constants import API_LINK
 
 

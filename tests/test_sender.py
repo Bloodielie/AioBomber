@@ -20,5 +20,3 @@ async def test_get_services(sender):
     assert isinstance(services, list)
     assert isinstance(services[0], dict)
     await sender.post('https://github.com/', data={'test': True})
-
-
