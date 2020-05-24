@@ -11,11 +11,12 @@ async def main(loop: AbstractEventLoop) -> None:
     parser.add_argument('--phone', action="store", required=True, type=str, help="Phone for SMS Bomber")
     parser.add_argument('--cycles', action="store", default=1, type=int, help="Number of cycles")
     parser.add_argument('--debug', action="store", default=False, type=bool, help="Debug mode")
+    parser.add_argument('--path', action="store", default='./services.json', type=str, help="Path to json file with services")
     args = parser.parse_args()
     configuration_logger(is_debug=args.debug)
 
     logger.info('Start AioBomber')
-    bomber = AioBomber(loop=loop)
+    bomber = AioBomber(loop=loop, path_to_service=args.path)
     await bomber.attack(args.cycles, args.phone)
     logger.info('Exit')
     loop.stop()

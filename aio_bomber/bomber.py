@@ -5,7 +5,6 @@ from loguru import logger
 
 from . import sender, preparer
 from .utils import pending_tasks
-from .constants import DEFAULT_PATH_TO_SERVICES
 
 
 class AioBomber:
@@ -13,7 +12,7 @@ class AioBomber:
         self.sender = sender.Sender()
         self._preparer = preparer.InformationPreparer()
         self._loop = loop or self._get_loop()
-        self.path_to_service = path_to_service or DEFAULT_PATH_TO_SERVICES
+        self.path_to_service = path_to_service
 
     @staticmethod
     def _get_loop() -> asyncio.AbstractEventLoop:
