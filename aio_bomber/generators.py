@@ -5,7 +5,7 @@ from aio_bomber.constants import LATIN_ALPHABET, LIST_OF_LASTTNAME, LIST_OF_FIRS
 
 
 class DynamicDataGenerator:
-    def generation(self, dynamic_data: Dict[str, Optional[str]], phone: str) -> Dict[str, str]:
+    def generation(self, dynamic_data: Dict[str, Optional[str]], phone: str) -> Dict[Optional[str], str]:
         dynamic_args = {}
         if not dynamic_data:
             raise Exception('Not dynamic_data in json')

@@ -1,5 +1,5 @@
 import json
-from typing import List, Dict, Any, Union, Optional
+from typing import List, Dict, Any, Union, Optional, Iterable
 
 from aiohttp import ClientSession, client_exceptions
 from loguru import logger
@@ -16,7 +16,7 @@ class Sender:
     def __init__(self, session: ClientSession = None):
         self._session = session or ClientSession(headers=self._headers)
 
-    async def get_services(self, path: str = None, url: str = None, encoding: str = 'utf-8') -> List[Dict[str, Any]]:
+    async def get_services(self, path: str = None, url: str = None, encoding: str = 'utf-8') -> Union[List[Dict[str, Any]], None]:
         url = url if url is not None else API_LINK
         services = []
         if path is not None:
@@ -29,7 +29,7 @@ class Sender:
         services.extend(json_)
         return services
 
-    async def get(self, url: str, **kwargs: Union[dict, str]) -> Optional[Dict[str, Any]]:
+    async def get(self, url: str, **kwargs: Union[dict, str]) -> Iterable[List[dict]]:
         return await self.request('get', url=url, **kwargs)
 
     async def post(self, url: str, data: dict, header: dict = None, **kwargs: Union[dict, str]) -> Optional[Dict[str, Any]]:
