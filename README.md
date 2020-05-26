@@ -21,4 +21,5 @@ $ python bomber.py --phone=<номер телефона> -- cycles=<количе
 ```
 
 ### Есть вопросы?
-[telegram](https://t.me/ohmaydev)
+Подробнее о аргументах командной строки [wiki](https://github.com/Bloodielie/AioBomber/wiki/Аргументы-командной-строки)  
+Связаться: [telegram](https://t.me/ohmaydev)  
